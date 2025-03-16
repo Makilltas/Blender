@@ -2,38 +2,33 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float speed = 20f; 
-    public float damage = 10f; 
+    public Transform target;
+    public float speed = 20;
+    public float lifeTime = 3;
+    public int damage = 100;
 
-    private Vector3 direction;
-
-    public void SetDirection(Vector3 newDirection)
+    void Start()
     {
-        direction = newDirection;
+        Destroy(gameObject, lifeTime);
     }
 
     void Update()
     {
-        transform.Translate(direction * speed * Time.deltaTime);
+        if (target == null) return;
 
-        
-        if (Vector3.Distance(transform.position, Camera.main.transform.position) > 100f)
-        {
-            Destroy(gameObject);
-        }
+        transform.LookAt(target);
+        transform.position += transform.forward * speed * Time.deltaTime;
+
+
     }
 
-    void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {
-        if (other.CompareTag("Enemy"))
+        if (other.transform.CompareTag("Emeny"))
         {
-           
-            Enemy_Health enemyHealth = other.GetComponent<Enemy_Health>();
-            if (enemyHealth != null)
-            {
-                enemyHealth.TakeDamage(damage);
-            }
-            Destroy(gameObject);
+            var health = other.gameObject.GetComponent<Health>();
+            health?.TakeDamage(damage);
         }
+        Destroy(gameObject);
     }
 }
